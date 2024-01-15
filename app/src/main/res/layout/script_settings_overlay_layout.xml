@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/darker_gray"> <!-- Set your desired background color or drawable -->
+
+    <!-- Dropdown for Log Type -->
+    <Spinner
+        android:id="@+id/logTypeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/log_types" />
+
+    <!-- Dropdown for Starting Location -->
+    <Spinner
+        android:id="@+id/startLocationSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/start_locations" />
+
+    <!-- Checkbox for Banking Logs -->
+    <CheckBox
+        android:id="@+id/bankLogsCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bank Logs" />
+    <CheckBox
+        android:id="@+id/bankLogsCheckbox2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bank Logs" />
+
+    <!-- Button to Confirm Settings and Start Script -->
+    <Button
+        android:id="@+id/confirmSettingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

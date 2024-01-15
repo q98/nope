@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string-array name="log_types">
+        <item>Tree</item>
+        <item>Oak</item>
+        <item>Maple</item>
+        <item>Willow</item>
+        <item>Yew</item>
+    </string-array>
+
+    <string-array name="start_locations">
+        <item>Lumbridge</item>
+        <item>Draynor Village</item>
+    </string-array>
+</resources>
