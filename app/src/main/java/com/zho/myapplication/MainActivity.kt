@@ -6,15 +6,14 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.zho.myapplication.bot.ScriptManager
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var startButton: Button
     private lateinit var stopButton: Button
+    private var isServiceRunning = false
     private val REQUEST_CODE_SCREEN_CAPTURE = 100
     private val REQUEST_CODE_OVERLAY_PERMISSION = 101
 
@@ -27,36 +26,39 @@ class MainActivity : AppCompatActivity() {
             startOverlayService()
             startScreenCapture()
         }
+
         stopButton = findViewById(R.id.stopButton)
         stopButton.setOnClickListener {
             stopServices()
         }
 
+        checkOverlayPermission()
+    }
 
+    private fun checkOverlayPermission() {
         if (!Settings.canDrawOverlays(this)) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
             startActivityForResult(intent, REQUEST_CODE_OVERLAY_PERMISSION)
         }
     }
 
+    private fun startOverlayService() {
+        startService(Intent(this, OverlayService::class.java))
+        isServiceRunning = true
+    }
+
     private fun startScreenCapture() {
         val mediaProjectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE_SCREEN_CAPTURE)
     }
+
     private fun stopServices() {
-        Log.d("STOPPING", "STOPPING")
-        val stopScreenCaptureIntent = Intent(this, ScreenCaptureService::class.java)
-        stopService(stopScreenCaptureIntent)
-
-        val stopOverlayIntent = Intent(this, OverlayService::class.java)
-        stopService(stopOverlayIntent)
-
-    }
-
-
-
-    private fun startOverlayService() {
-        startService(Intent(this, OverlayService::class.java))
+        if (isServiceRunning) {
+            val stopIntent = Intent(this, OverlayService::class.java)
+            stopIntent.action = "STOP_ALL"
+            startService(stopIntent)
+            isServiceRunning = false
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

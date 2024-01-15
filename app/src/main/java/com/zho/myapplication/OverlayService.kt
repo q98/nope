@@ -50,6 +50,15 @@ class OverlayService : Service() {
         setupStartStopButton()
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.action?.let { action ->
+            if (action == "STOP_ALL") {
+                killAll()
+            }
+        }
+        return START_STICKY
+    }
+
     private fun setupOverlays() {
         overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
         settingsOverlayView =
@@ -76,9 +85,9 @@ class OverlayService : Service() {
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            scripts.map { it.toString() })
+            scripts.map { it.toString() }
+        )
         scriptSpinner.adapter = adapter
-
         startStopButton.setOnClickListener {
             val selectedScript = scripts[scriptSpinner.selectedItemPosition] as AutomationScript
 
@@ -86,36 +95,13 @@ class OverlayService : Service() {
                 selectedScript.setActionListener(scriptActionListener)
                 showSettingsOverlay(selectedScript)
             } else {
-                stopScript()
-            }
-        }
-
-
-
-        fun onDestroy() {
-            super.onDestroy()
-            if (::overlayView.isInitialized) {
-                windowManager.removeView(overlayView)
-            }
-            if (::settingsOverlayView.isInitialized && settingsOverlayShown) {
-                windowManager.removeView(settingsOverlayView)
+                killAll()
             }
         }
     }
 
-    fun stopScript() {
-        scriptManager?.stop()
-        updateButtonState(false)
-    }
-
-    private fun updateButtonState(isRunning: Boolean) {
-        val startStopButton: Button = overlayView.findViewById(R.id.startStopScriptButton)
-        startStopButton.text = if (isRunning) "Stop" else "Start"
-        isScriptRunning = isRunning
-    }
-
-    private fun showSettingsOverlay(selectedScript: AutomationScript) {
-        val settingsView = selectedScript.createSettingsView(LayoutInflater.from(this), null)
+    private fun showSettingsOverlay(script: AutomationScript) {
+        val settingsView = script.createSettingsView(LayoutInflater.from(this), null)
         (settingsOverlayView as ViewGroup).removeAllViews()
         (settingsOverlayView as ViewGroup).addView(settingsView)
 
@@ -134,6 +120,33 @@ class OverlayService : Service() {
             settingsOverlayShown = true
         }
     }
+
+    private fun killAll() {
+        scriptManager?.stop()
+        updateButtonState(false)
+        if (::overlayView.isInitialized) {
+            windowManager.removeView(overlayView)
+        }
+        if (::settingsOverlayView.isInitialized && settingsOverlayShown) {
+            windowManager.removeView(settingsOverlayView)
+            settingsOverlayShown = false
+        }
+        stopSelf()
+    }
+
+    private fun updateButtonState(isRunning: Boolean) {
+        val startStopButton: Button = overlayView.findViewById(R.id.startStopScriptButton)
+        startStopButton.text = if (isRunning) "Stop" else "Start"
+        isScriptRunning = isRunning
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::overlayView.isInitialized) {
+            windowManager.removeView(overlayView)
+        }
+        if (::settingsOverlayView.isInitialized && settingsOverlayShown) {
+            windowManager.removeView(settingsOverlayView)
+        }
+    }
 }
-
-
