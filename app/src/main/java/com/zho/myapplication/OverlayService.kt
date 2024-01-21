@@ -31,6 +31,9 @@ class OverlayService : Service() {
             updateButtonState(true)
         }
 
+        /**
+         * Called when the settings overlay is hidden.
+         */
         override fun onHideSettingsOverlay() {
             if (settingsOverlayShown) {
                 windowManager.removeView(settingsOverlayView)
@@ -58,6 +61,7 @@ class OverlayService : Service() {
         }
         return START_STICKY
     }
+    
 
     private fun setupOverlays() {
         overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
